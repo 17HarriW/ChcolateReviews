@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,17 +11,28 @@ namespace ChcolateReviews
     {
         static void Main(string[] args)
         {
-            bool running = false;
+            SqlConnection connection = new SqlConnection();
+            connection.ConnectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=Reviews.mdf;Integrated Security=True";
+            connection.Open();
+            Console.WriteLine("Connection Succeeded");
+            connection.Close();
+
             Console.WriteLine("Welcome to the Chocolate Bar Review admin console");
             Console.WriteLine("Main Menu:");
             Console.WriteLine("==========");
 
-            while(!running)
+            bool running = true;
+
+            while (running)
             {
                 Console.WriteLine("1) Show all reviews");
                 Console.WriteLine("2) Add new review");
                 Console.WriteLine("3) Update review");
                 Console.WriteLine("4) Delete review");
+                Console.WriteLine("5) Show all users");
+                Console.WriteLine("6) Add a new user");
+                Console.WriteLine("7) Update user");
+                Console.WriteLine("8) Delete user");
                 Console.WriteLine("Q) Quit");
 
                 char choice = Console.ReadLine().ToLower()[0];
@@ -38,6 +50,18 @@ namespace ChcolateReviews
                         break;
                     case '4':
                         Console.WriteLine("Which review would you like to delete? (Enter ID):");
+                        break;
+                    case '5':
+                        Console.WriteLine("Showing all users:");
+                        break;
+                    case '6':
+                        Console.WriteLine("Adding new user:");
+                        break;
+                    case '7':
+                        Console.WriteLine("Which user would you like to update?: (Enter ID)");
+                        break;
+                    case '8':
+                        Console.WriteLine("Which user would you like to delete? (Enter ID):");
                         break;
                     case 'q':
                         running = false;
