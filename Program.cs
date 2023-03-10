@@ -28,6 +28,7 @@ namespace ChcolateReviews
             connection.ConnectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\tmp\Reviews.mdf;Integrated Security=True";
             connection.Open();
             Console.WriteLine("Connection Succeeded");
+            connection.Close();
 
             Console.WriteLine(@"
    ____ _                     ____            _               
@@ -56,13 +57,15 @@ namespace ChcolateReviews
                 Console.WriteLine("Q) Quit");
 
                 char choice = Console.ReadLine().ToLower()[0];
+                string sql = "";
 
                 switch(choice)
                 {
                     case '1':
                         Console.WriteLine("Showing all reviews:");
-                        string sql = "SELECT * FROM Reviews";
+                        sql = "SELECT * FROM Reviews";
 
+                        connection.Open();
                         SqlCommand cmd = new SqlCommand(sql, connection);
                         SqlDataReader r = cmd.ExecuteReader();
                         while(r.Read())
@@ -71,10 +74,22 @@ namespace ChcolateReviews
 
                             Console.WriteLine(existingReview);
                         }
+                        connection.Close();
                         break;
                     case '2':
                         Console.WriteLine("Adding new review:");
-
+                        Review newReview = new Review(
+                            -1,
+                            ValidatedInput.ReadInt("Enter chocolate bar ID: "),
+                            ValidatedInput.ReadInt("Enter user ID: "),
+                            ValidatedInput.ReadInt("Review Score: "),
+                            ValidatedInput.ReadString("Enter review: ", 0, 255)
+                            );
+                        connection.Open();
+                        sql = $"INSERT INTO Reviews (ChocolateBarID, UserID, Score, Comment) VALUES ({newReview.ChocolateBarID}, {newReview.UserID}, {newReview.ScoreID}, '{newReview.Comment}')";
+                        SqlCommand addCommand = new SqlCommand(sql);
+                        addCommand.ExecuteNonQuery();
+                        connection.Close();
                         break;
                     case '3':
                         Console.WriteLine("Which review would you like to update?: (EnterID)");
@@ -98,7 +113,6 @@ namespace ChcolateReviews
                         running = false;
                         break;
                 }
-                connection.Close();
             }
         }
     }
