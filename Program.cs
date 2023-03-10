@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,8 +12,17 @@ namespace ChcolateReviews
     {
         static void Main(string[] args)
         {
+            const string filename = @"C:\tmp\Reviews.mdf";
+
+            if(!File.Exists(filename))
+            {
+                Console.WriteLine($"Data not found at {filename}: copying a fresh version");
+                File.Copy("Reviews.mdf", filename);
+
+            }
+
             SqlConnection connection = new SqlConnection();
-            connection.ConnectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=Reviews.mdf;Integrated Security=True";
+            connection.ConnectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\tmp\Reviews.mdf;Integrated Security=True";
             connection.Open();
             Console.WriteLine("Connection Succeeded");
             connection.Close();
@@ -68,8 +78,6 @@ namespace ChcolateReviews
                         break;
                 }
             }
-
-            Console.ReadLine();
         }
     }
 }
