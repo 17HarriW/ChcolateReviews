@@ -17,16 +17,26 @@ namespace ChcolateReviews
             if(!File.Exists(filename))
             {
                 Console.WriteLine($"Data not found at {filename}: copying a fresh version");
+                if(!Directory.Exists(@"C:\tmp"))
+                {
+                    Directory.CreateDirectory(@"C:\tmp");
+                }
                 File.Copy("Reviews.mdf", filename);
-
             }
 
             SqlConnection connection = new SqlConnection();
             connection.ConnectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\tmp\Reviews.mdf;Integrated Security=True";
             connection.Open();
             Console.WriteLine("Connection Succeeded");
-            connection.Close();
 
+            Console.WriteLine(@"
+   ____ _                     ____            _               
+  / ___| |__   ___   ___ ___ |  _ \ _____   _(_) _____      __
+ | |   | '_ \ / _ \ / __/ _ \| |_) / _ \ \ / / |/ _ \ \ /\ / /
+ | |___| | | | (_) | (_| (_) |  _ <  __/\ V /| |  __/\ V  V / 
+  \____|_| |_|\___/ \___\___/|_| \_\___| \_/ |_|\___| \_/\_/  
+                                                              
+");
             Console.WriteLine("Welcome to the Chocolate Bar Review admin console");
             Console.WriteLine("Main Menu:");
             Console.WriteLine("==========");
@@ -51,9 +61,20 @@ namespace ChcolateReviews
                 {
                     case '1':
                         Console.WriteLine("Showing all reviews:");
+                        string sql = "SELECT * FROM Reviews";
+
+                        SqlCommand cmd = new SqlCommand(sql, connection);
+                        SqlDataReader r = cmd.ExecuteReader();
+                        while(r.Read())
+                        {
+                            Review existingReview = new Review(r);
+
+                            Console.WriteLine(existingReview);
+                        }
                         break;
                     case '2':
                         Console.WriteLine("Adding new review:");
+
                         break;
                     case '3':
                         Console.WriteLine("Which review would you like to update?: (EnterID)");
@@ -77,6 +98,7 @@ namespace ChcolateReviews
                         running = false;
                         break;
                 }
+                connection.Close();
             }
         }
     }
