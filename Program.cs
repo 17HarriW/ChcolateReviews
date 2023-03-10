@@ -87,7 +87,7 @@ namespace ChcolateReviews
                             );
                         connection.Open();
                         sql = $"INSERT INTO Reviews (ChocolateBarID, UserID, Score, Comment) VALUES ({newReview.ChocolateBarID}, {newReview.UserID}, {newReview.ScoreID}, '{newReview.Comment}')";
-                        SqlCommand addCommand = new SqlCommand(sql);
+                        SqlCommand addCommand = new SqlCommand(sql, connection);
                         addCommand.ExecuteNonQuery();
                         connection.Close();
                         break;
