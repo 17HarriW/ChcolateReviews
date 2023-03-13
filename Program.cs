@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ChcolateReviews
+namespace ChocolateReviews
 {
     class Program
     {
@@ -56,7 +56,16 @@ namespace ChcolateReviews
                 Console.WriteLine("8) Delete user");
                 Console.WriteLine("Q) Quit");
 
-                char choice = Console.ReadLine().ToLower()[0];
+                string prompt = Console.ReadLine().ToLower();
+                char choice;
+                if (prompt.Length > 0)
+                {
+                    choice = prompt[0];
+                }
+                else
+                {
+                    choice = 'x';
+                }
                 string sql = "";
 
                 switch(choice)
@@ -76,6 +85,7 @@ namespace ChcolateReviews
                         }
                         connection.Close();
                         break;
+
                     case '2':
                         Console.WriteLine("Adding new review:");
                         Review newReview = new Review(
@@ -86,31 +96,75 @@ namespace ChcolateReviews
                             ValidatedInput.ReadString("Enter review: ", 0, 255)
                             );
                         connection.Open();
-                        sql = $"INSERT INTO Reviews (ChocolateBarID, UserID, Score, Comment) VALUES ({newReview.ChocolateBarID}, {newReview.UserID}, {newReview.ScoreID}, '{newReview.Comment}')";
+                        sql = $"INSERT INTO Reviews (ChocolateBarID, UserID, Score, Comment) VALUES ({newReview.ChocolateBarID}, {newReview.UserID}, {newReview.Score}, '{newReview.Comment}')";
                         SqlCommand addCommand = new SqlCommand(sql, connection);
                         addCommand.ExecuteNonQuery();
                         connection.Close();
                         break;
+
                     case '3':
-                        Console.WriteLine("Which review would you like to update?: (EnterID)");
+                        int reviewID = ValidatedInput.ReadInt("Which review would you like to update?: (Enter ID)");
+                        connection.Open();
+                        sql = "SELECT * FROM Reviews WHERE ReviewID = @ReviewID";
+                        SqlCommand editCommand = new SqlCommand(sql, connection);
+                        editCommand.Parameters.AddWithValue("ReviewID", reviewID);
+                        r = editCommand.ExecuteReader();
+                        if(r.Read())
+                        {
+                            Review reviewToEdit = new Review(r);
+                            Console.WriteLine("Record found: " + reviewToEdit);
+
+                            reviewToEdit.ChocolateBarID = ValidatedInput.ReadInt("Enter new ChocolateBarID: ");
+                            reviewToEdit.UserID = ValidatedInput.ReadInt("Enter new UserID");
+                            reviewToEdit.Score = ValidatedInput.ReadInt("Enter new score (1-10)");
+                            reviewToEdit.Comment = ValidatedInput.ReadString("Enter new comment", 0, 255);
+                            sql = "UPDATE Reviews " +
+                                "SET ChocolateBarID=@ChocolateBarID, UserID=@UserID, Score=@Score, Comment=@Comment " +
+                                "WHERE ReviewID=@ReviewID";
+                            connection.Close();
+
+                            SqlCommand editCommandUpdate = new SqlCommand(sql, connection);
+                            connection.Open();
+                            editCommand.Parameters.AddWithValue("ChocolateBarID", reviewToEdit.ChocolateBarID);
+                            editCommand.Parameters.AddWithValue("UserID", reviewToEdit.UserID);
+                            editCommand.Parameters.AddWithValue("Score", reviewToEdit.Score);
+                            editCommand.Parameters.AddWithValue("Comment", reviewToEdit.Comment);
+                            editCommand.Parameters.AddWithValue("ReviewID", reviewToEdit.ReviewID);
+                            Console.WriteLine("Record updated");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Record not found");
+                        }
+                        connection.Close();
                         break;
+
                     case '4':
                         Console.WriteLine("Which review would you like to delete? (Enter ID):");
                         break;
+
                     case '5':
                         Console.WriteLine("Showing all users:");
                         break;
+
                     case '6':
                         Console.WriteLine("Adding new user:");
                         break;
+
                     case '7':
                         Console.WriteLine("Which user would you like to update?: (Enter ID)");
                         break;
+
                     case '8':
                         Console.WriteLine("Which user would you like to delete? (Enter ID):");
                         break;
+
                     case 'q':
                         running = false;
+                        break;
+
+                    default:
+                        Console.WriteLine("Please enter a valid input");
                         break;
                 }
             }
