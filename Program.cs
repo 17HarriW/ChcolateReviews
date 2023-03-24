@@ -90,10 +90,10 @@ namespace ChocolateReviews
                         Console.WriteLine("Adding new review:");
                         Review newReview = new Review(
                             -1,
-                            ValidatedInput.ReadInt("Enter chocolate bar ID: "),
-                            ValidatedInput.ReadInt("Enter user ID: "),
-                            ValidatedInput.ReadInt("Review Score: "),
-                            ValidatedInput.ReadString("Enter review: ", 0, 255)
+                            ValidatedInput.ReadInt("Enter chocolate bar ID:"),
+                            ValidatedInput.ReadInt("User ID:"),
+                            ValidatedInput.ReadInt("Review score:"),
+                            ValidatedInput.ReadString("Enter review:", 0, 255)
                             );
                         connection.Open();
                         sql = $"INSERT INTO Reviews (ChocolateBarID, UserID, Score, Comment) VALUES ({newReview.ChocolateBarID}, {newReview.UserID}, {newReview.Score}, '{newReview.Comment}')";
